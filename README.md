@@ -1,147 +1,126 @@
 
 
----
+![PyTorch](https://img.shields.io/badge/PyTorch-DeepLearning-red)
+![ONNX](https://img.shields.io/badge/ONNX-Export-blue)
 
-# 🚀 ML4SCI GSoC 2026 — Particle Mass Regression
+# ML4SCI GSoC 2026 — Mass Regression (Task 2f/2g)
 
-End-to-end deep learning pipeline for **particle mass regression** using CMS detector data, implemented in PyTorch and exported to ONNX for deployment.
+This notebook implements an end-to-end pipeline for particle mass regression using CMS detector data, including preprocessing, model training, and ONNX export.
+
+
+## 🚀 ML4SCI GSoC 2026 — Particle Mass Regression
+
+> End-to-end deep learning pipeline for **particle mass regression** using CMS detector data, with ONNX export for deployment.
 
 ---
 
 ## 📌 Overview
 
-This project solves the **mass regression task (Task 2f/2g)** from ML4SCI by building a complete pipeline:
+This project implements a complete pipeline for **mass regression (Task 2f/2g)** using PyTorch, starting from raw CMS detector data in `.parquet` format to a deployable ONNX model.
 
-* Efficient data loading from large `.parquet` files
-* Reconstruction of detector data into image format
-* CNN-based regression model
-* Model export to ONNX for inference compatibility
+The focus is on handling **real-world scientific data challenges**, including memory constraints, nested data structures, and sparse detector representations.
 
 ---
 
-## 🧠 Approach
+## 🧠 Key Contributions
 
-### 🔹 Data Loading
-
-* Dataset provided in **Parquet format**
-* Used **PyArrow row-group streaming** to avoid memory overflow
-* Loaded subset of data (200–500 samples) for efficient experimentation
+* ✅ Efficient **row-group streaming** for large parquet dataset
+* ✅ Reconstruction of **detector data into image format**
+* ✅ Selection of relevant physics channels (**Track pT, ECAL**)
+* ✅ CNN-based regression model
+* ✅ Stable training via **target normalization**
+* ✅ Exported model to **ONNX for inference compatibility**
 
 ---
 
-### 🔹 Data Preprocessing
+## ⚙️ Methodology
 
-* Each sample contains detector information in nested format
-* Reconstructed into image representation of shape:
+### 🔹 Data Processing
+
+* Used **PyArrow** to load parquet data incrementally
+* Handled **nested object arrays** via custom flattening
+* Reconstructed sparse detector data into:
 
 ```text
-(Channels, Height, Width) = (2, 125, 125)
+(2, 125, 125)
 ```
-
-* Selected only required channels:
-
-  * **Track pT**
-  * **ECAL**
-
-* Used **ieta mapping** to place values into spatial grid
 
 ---
 
 ### 🔹 Model Architecture
 
-A lightweight CNN designed for sparse detector data:
+* Lightweight CNN:
 
-* 3 Convolutional layers + ReLU + MaxPooling
-* Fully connected layers for regression output
-* Input shape: `(2, 125, 125)`
-* Output: scalar mass value
+  * 3 Conv layers + ReLU + MaxPooling
+  * Fully connected regression head
+* Designed for **sparse and structured physics data**
 
 ---
 
-### 🔹 Training
+### 🔹 Training Setup
 
-* Train/Test Split: **80/20**
-* Loss Function: **Mean Squared Error (MSE)**
+* Train/Test split: **80/20**
+* Loss: **Mean Squared Error (MSE)**
 * Optimizer: **Adam**
-* Target normalization applied for stable training
+* Applied **target normalization**
 
 ---
 
-## 📊 Results
+## 📊 Results & Analysis
 
-* Stable training achieved with normalized loss ≈ **0.95**
-* Model successfully learns mass regression from limited dataset
 
-> Note: Training performed on subset due to memory constraints.
+<img width="576" height="455" alt="image" src="https://github.com/user-attachments/assets/b79c48a3-abab-490e-8ab5-4270519fbb2e" />
+
+
+### Training Analysis
+
+The training and validation losses remain stable across epochs, indicating convergence.  
+However, limited improvement suggests constraints due to:
+- Small dataset size  
+- Simplified detector reconstruction  
+
+Future improvements include using full spatial mapping and larger datasets.
+
+
+* Achieved stable training with loss ≈ **0.95**
+* Training and validation curves show **early convergence**
+
+📌 Insight:
+
+> Performance is limited by small dataset size and simplified spatial reconstruction. Incorporating full detector geometry (ieta, iphi) and larger datasets would significantly improve accuracy.
 
 ---
 
-## 📦 ONNX Export (Task 2g)
+## 📦 ONNX Export
 
-The trained model is exported to ONNX format:
+The trained model is exported for deployment:
 
 ```bash
 mass_model.onnx
 ```
 
-This enables compatibility with inference frameworks such as **CMSSW**.
-
----
-
-## ⚙️ Installation
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## ▶️ Usage
-
-Run the notebook:
-
-```bash
-notebook.ipynb
-```
-
-Steps included:
-
-1. Data loading
-2. Preprocessing
-3. Model training
-4. Evaluation
-5. ONNX export
-
----
-
-## 📁 Project Structure
-
-```bash
-ml4sci-mass-regression/
-│
-├── notebook.ipynb
-├── mass_model.onnx
-├── README.md
-├── requirements.txt
-```
+* Compatible with inference frameworks (e.g., CMSSW)
+* Exported using latest ONNX opset
 
 ---
 
 ## 🚧 Challenges & Solutions
 
-* Handling **large parquet dataset** → solved using row-group streaming
-* Decoding **nested object arrays** → implemented custom flattening
-* Reconstructing **sparse detector data** → used coordinate-based mapping
-* Ensuring **ONNX compatibility** → exported model with correct opset
+| Challenge            | Solution             |
+| -------------------- | -------------------- |
+| Large dataset        | Row-group streaming  |
+| Nested arrays        | Custom flattening    |
+| Sparse detector data | Image reconstruction |
+| Memory limits        | Subset training      |
 
 ---
 
 ## 🔮 Future Work
 
-* Train on full dataset for improved accuracy
-* Use full `(ieta, iphi)` mapping for better spatial reconstruction
-* Experiment with deeper CNN / ResNet architectures
-* Add evaluation metrics like MAE / RMSE
+* Train on full dataset
+* Use full `(ieta, iphi)` mapping
+* Explore deeper architectures (ResNet)
+* Add evaluation metrics (MAE, RMSE)
 
 ---
 
@@ -154,7 +133,8 @@ B.Tech Robotics & Automation, REVA University
 
 ## ⭐ Acknowledgements
 
-* ML4SCI (Machine Learning for Science)
+* ML4SCI
 * CERN Open Data
 
 ---
+
